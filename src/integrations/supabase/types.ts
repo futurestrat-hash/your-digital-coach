@@ -14,7 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          goal_id: string | null
+          id: string
+          logged_at: string
+          minutes: number
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          goal_id?: string | null
+          id?: string
+          logged_at?: string
+          minutes?: number
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          goal_id?: string | null
+          id?: string
+          logged_at?: string
+          minutes?: number
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          archived: boolean
+          category: string
+          created_at: string
+          detail: string | null
+          id: string
+          title: string
+          user_id: string
+          weekly_minutes_target: number
+        }
+        Insert: {
+          archived?: boolean
+          category?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title: string
+          user_id: string
+          weekly_minutes_target?: number
+        }
+        Update: {
+          archived?: boolean
+          category?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+          weekly_minutes_target?: number
+        }
+        Relationships: []
+      }
+      mom_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          ideas: Json
+          kind: string
+          mood: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          ideas?: Json
+          kind?: string
+          mood?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          ideas?: Json
+          kind?: string
+          mood?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          mom_name: string
+          mom_variant: string
+          onboarded: boolean
+          sass_level: number
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          mom_name?: string
+          mom_variant?: string
+          onboarded?: boolean
+          sass_level?: number
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          mom_name?: string
+          mom_variant?: string
+          onboarded?: boolean
+          sass_level?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
