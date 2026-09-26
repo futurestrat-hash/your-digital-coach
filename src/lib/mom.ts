@@ -41,7 +41,7 @@ export const MOM_VARIANTS: {
 ];
 
 export function getVariant(id: string | null | undefined) {
-  return MOM_VARIANTS.find((v) => v.id === id) ?? MOM_VARIANTS[0];
+  return MOM_VARIANTS.find((v) => v.id === id) ?? MOM_VARIANTS[0]!;
 }
 
 export function momArt(variantId: string | null | undefined, mood: string | null | undefined) {

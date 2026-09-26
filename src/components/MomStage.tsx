@@ -19,7 +19,7 @@ export function MomStage({
   variant: string;
   mood: string;
   name: string;
-  message?: string | null;
+  message?: string | null | undefined;
   loading?: boolean;
   className?: string;
 }) {
