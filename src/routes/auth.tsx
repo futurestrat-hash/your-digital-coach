@@ -33,7 +33,10 @@ function AuthPage() {
   const [unconfirmed, setUnconfirmed] = useState(false);
 
   async function resend() {
-    if (!email) return toast.error("Type your email first.");
+    if (!email) {
+      toast.error("Type your email first.");
+      return;
+    }
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
