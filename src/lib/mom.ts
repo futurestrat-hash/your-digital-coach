@@ -68,3 +68,50 @@ export const SASS_LABELS: Record<number, string> = {
   4: "Sharp tongued",
   5: "Absolutely merciless",
 };
+
+export const COMMON_TIMEZONES = [
+  "Pacific/Auckland",
+  "Australia/Sydney",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+  "Asia/Singapore",
+  "Asia/Kolkata",
+  "Asia/Dubai",
+  "Europe/Moscow",
+  "Europe/Berlin",
+  "Europe/London",
+  "Atlantic/Azores",
+  "America/Sao_Paulo",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Anchorage",
+  "Pacific/Honolulu",
+  "UTC",
+];
+
+export function detectTimezone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
+export function timezoneOptions(current?: string | null) {
+  const detected = detectTimezone();
+  const set = new Set<string>([detected, ...(current ? [current] : []), ...COMMON_TIMEZONES]);
+  return [...set];
+}
+
+export function timezoneLabel(tz: string) {
+  try {
+    const parts = new Intl.DateTimeFormat("en", { timeZone: tz, timeZoneName: "shortOffset" })
+      .formatToParts(new Date())
+      .find((p) => p.type === "timeZoneName")?.value;
+    return `${tz.replace(/_/g, " ")} (${parts ?? "UTC"})`;
+  } catch {
+    return tz;
+  }
+}
