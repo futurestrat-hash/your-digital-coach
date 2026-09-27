@@ -121,6 +121,7 @@ export type Database = {
           mom_variant: string
           onboarded: boolean
           sass_level: number
+          timezone: string
         }
         Insert: {
           created_at?: string
@@ -130,6 +131,7 @@ export type Database = {
           mom_variant?: string
           onboarded?: boolean
           sass_level?: number
+          timezone?: string
         }
         Update: {
           created_at?: string
@@ -139,6 +141,7 @@ export type Database = {
           mom_variant?: string
           onboarded?: boolean
           sass_level?: number
+          timezone?: string
         }
         Relationships: []
       }

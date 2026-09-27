@@ -8,6 +8,13 @@
       "when": 1790305373802,
       "tag": "0000_tiger_mom_core",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790467671585,
+      "tag": "0001_add_profile_timezone",
+      "breakpoints": true
     }
   ]
 }
