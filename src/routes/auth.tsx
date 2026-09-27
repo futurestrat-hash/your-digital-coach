@@ -30,6 +30,21 @@ function AuthPage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
+
+  async function resend() {
+    if (!email) {
+      toast.error("Type your email first.");
+      return;
+    }
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth` },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("New confirmation email sent. Use the newest one — older links stop working.");
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -50,7 +65,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/auth`,
             data: { full_name: name || email.split("@")[0] },
           },
         });
@@ -61,7 +76,14 @@ function AuthPage() {
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          if (error.code === "email_not_confirmed") {
+            setUnconfirmed(true);
+            throw new Error("Your email isn't confirmed yet. Tap 'Resend confirmation email' below.");
+          }
+          if (error.code === "invalid_credentials") throw new Error("Wrong email or password. Mom is disappointed, but try again.");
+          throw error;
+        }
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
@@ -136,6 +158,12 @@ function AuthPage() {
             {busy ? "One moment…" : mode === "signup" ? "Create account" : "Sign in"}
           </Button>
         </form>
+
+        {(sent || unconfirmed) && (
+          <Button variant="secondary" className="mt-3 w-full" onClick={resend}>
+            Resend confirmation email
+          </Button>
+        )}
 
         <Button variant="outline" className="mt-3 w-full" onClick={handleGoogle}>
           Continue with Google
