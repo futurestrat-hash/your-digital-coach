@@ -69,6 +69,28 @@ export const SASS_LABELS: Record<number, string> = {
   5: "Absolutely merciless",
 };
 
+export type MomAnimation = "fade" | "pop" | "slide" | "none";
+
+export const ANIMATION_OPTIONS: { id: MomAnimation; label: string; hint: string }[] = [
+  { id: "fade", label: "Fade in", hint: "She materializes, judgmentally." },
+  { id: "pop", label: "Pop in", hint: "She appears out of nowhere. Classic." },
+  { id: "slide", label: "Slide in", hint: "She enters like she owns the room." },
+  { id: "none", label: "No animation", hint: "She is simply… there." },
+];
+
+export function animationClass(pref: string | null | undefined) {
+  switch (pref) {
+    case "pop":
+      return "animate-scale-in";
+    case "slide":
+      return "animate-slide-in-right";
+    case "none":
+      return "";
+    default:
+      return "animate-fade-in";
+  }
+}
+
 export const COMMON_TIMEZONES = [
   "Pacific/Auckland",
   "Australia/Sydney",

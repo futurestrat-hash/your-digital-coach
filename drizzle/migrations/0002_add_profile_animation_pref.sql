@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN animation_pref text NOT NULL DEFAULT 'fade';
