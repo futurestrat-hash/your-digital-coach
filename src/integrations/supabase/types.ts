@@ -114,6 +114,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          animation_pref: string
           created_at: string
           display_name: string | null
           id: string
@@ -124,6 +125,7 @@ export type Database = {
           timezone: string
         }
         Insert: {
+          animation_pref?: string
           created_at?: string
           display_name?: string | null
           id: string
@@ -134,6 +136,7 @@ export type Database = {
           timezone?: string
         }
         Update: {
+          animation_pref?: string
           created_at?: string
           display_name?: string | null
           id?: string
