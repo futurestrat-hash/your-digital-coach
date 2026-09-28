@@ -9,14 +9,12 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ANIMATION_OPTIONS,
   GOAL_PRESETS,
   MOM_VARIANTS,
   SASS_LABELS,
   detectTimezone,
   timezoneLabel,
   timezoneOptions,
-  type MomAnimation,
   type MomVariantId,
 } from "@/lib/mom";
 import { cn } from "@/lib/utils";
@@ -41,7 +39,6 @@ function Onboarding() {
   const [momName, setMomName] = useState("Mom");
   const [sass, setSass] = useState(3);
   const [timezone, setTimezone] = useState(detectTimezone);
-  const [animation, setAnimation] = useState<MomAnimation>("fade");
   const [picked, setPicked] = useState<string[]>([]);
   const [customGoal, setCustomGoal] = useState("");
   const [detail, setDetail] = useState("");
