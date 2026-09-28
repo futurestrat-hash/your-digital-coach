@@ -8,7 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
-import { MOM_VARIANTS, SASS_LABELS, type MomVariantId } from "@/lib/mom";
+import {
+  MOM_VARIANTS,
+  SASS_LABELS,
+  detectTimezone,
+  timezoneLabel,
+  timezoneOptions,
+  type MomVariantId,
+} from "@/lib/mom";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -31,6 +38,7 @@ function Settings() {
   const [variant, setVariant] = useState<MomVariantId>("a");
   const [momName, setMomName] = useState("Mom");
   const [sass, setSass] = useState(3);
+  const [timezone, setTimezone] = useState(detectTimezone);
   const [newGoal, setNewGoal] = useState("");
 
   const profileQuery = useQuery({
@@ -62,13 +70,14 @@ function Settings() {
       setVariant((p.mom_variant as MomVariantId) ?? "a");
       setMomName(p.mom_name ?? "Mom");
       setSass(p.sass_level ?? 3);
+      setTimezone(p.timezone ?? detectTimezone());
     }
   }, [profileQuery.data]);
 
   async function saveProfile() {
     const { error } = await supabase
       .from("profiles")
-      .update({ mom_variant: variant, mom_name: momName.trim() || "Mom", sass_level: sass })
+      .update({ mom_variant: variant, mom_name: momName.trim() || "Mom", sass_level: sass, timezone })
       .eq("id", userId);
     if (error) {
       toast.error(error.message);
@@ -159,6 +168,21 @@ function Settings() {
             value={[sass]}
             onValueChange={(v) => setSass(v[0] ?? 3)}
           />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="timezone">Your time zone</Label>
+          <select
+            id="timezone"
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+          >
+            {timezoneOptions(timezone).map((tz) => (
+              <option key={tz} value={tz}>
+                {timezoneLabel(tz)}
+              </option>
+            ))}
+          </select>
         </div>
         <Button onClick={saveProfile}>Save</Button>
       </div>
