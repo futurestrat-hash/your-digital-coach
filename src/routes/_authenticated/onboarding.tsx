@@ -8,7 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { GOAL_PRESETS, MOM_VARIANTS, SASS_LABELS, type MomVariantId } from "@/lib/mom";
+import {
+  GOAL_PRESETS,
+  MOM_VARIANTS,
+  SASS_LABELS,
+  detectTimezone,
+  timezoneLabel,
+  timezoneOptions,
+  type MomVariantId,
+} from "@/lib/mom";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
@@ -30,6 +38,7 @@ function Onboarding() {
   const [variant, setVariant] = useState<MomVariantId>("a");
   const [momName, setMomName] = useState("Mom");
   const [sass, setSass] = useState(3);
+  const [timezone, setTimezone] = useState(detectTimezone);
   const [picked, setPicked] = useState<string[]>([]);
   const [customGoal, setCustomGoal] = useState("");
   const [detail, setDetail] = useState("");
@@ -56,6 +65,7 @@ function Onboarding() {
           mom_variant: variant,
           mom_name: momName.trim() || "Mom",
           sass_level: sass,
+          timezone,
           onboarded: true,
         })
         .eq("id", userId);
@@ -138,6 +148,24 @@ function Onboarding() {
                 value={[sass]}
                 onValueChange={(v) => setSass(v[0] ?? 3)}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="timezone">Your time zone</Label>
+              <select
+                id="timezone"
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs"
+              >
+                {timezoneOptions(timezone).map((tz) => (
+                  <option key={tz} value={tz}>
+                    {timezoneLabel(tz)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">
+                So she knows when "today" ends — and when to start worrying.
+              </p>
             </div>
           </div>
 
