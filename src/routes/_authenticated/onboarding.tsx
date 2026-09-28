@@ -66,7 +66,6 @@ function Onboarding() {
           mom_name: momName.trim() || "Mom",
           sass_level: sass,
           timezone,
-          animation_pref: animation,
           onboarded: true,
         })
         .eq("id", userId);
@@ -167,25 +166,6 @@ function Onboarding() {
               <p className="text-xs text-muted-foreground">
                 So she knows when "today" ends — and when to start worrying.
               </p>
-            </div>
-            <div className="space-y-1.5">
-              <Label>How should she make an entrance?</Label>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {ANIMATION_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setAnimation(opt.id)}
-                    className={cn(
-                      "rounded-md border border-border p-3 text-left text-sm transition-colors",
-                      animation === opt.id ? "ring-2 ring-primary" : "hover:bg-secondary",
-                    )}
-                  >
-                    <p className="font-display font-bold">{opt.label}</p>
-                    <p className="text-xs text-muted-foreground">{opt.hint}</p>
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
 
