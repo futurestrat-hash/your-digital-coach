@@ -94,8 +94,26 @@ export const momSpeak = createServerFn({ method: "POST" })
 
     const goalList = goals ?? [];
     const logList = logs ?? [];
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const tz = profile?.timezone ?? "UTC";
+    const now = new Date();
+    let startOfToday: Date;
+    let localTime: string;
+    try {
+      const localDate = new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(now);
+      const offsetParts = new Intl.DateTimeFormat("en-US", {
+        timeZone: tz,
+        timeZoneName: "longOffset",
+      })
+        .formatToParts(now)
+        .find((p) => p.type === "timeZoneName")?.value;
+      const offset = offsetParts?.replace("GMT", "") || "+00:00";
+      startOfToday = new Date(`${localDate}T00:00:00${offset === "" ? "+00:00" : offset}`);
+      localTime = now.toLocaleString("en-US", { timeZone: tz, dateStyle: "full", timeStyle: "short" });
+    } catch {
+      startOfToday = new Date(now);
+      startOfToday.setUTCHours(0, 0, 0, 0);
+      localTime = now.toUTCString();
+    }
     const todayLogs = logList.filter((l) => new Date(l.logged_at) >= startOfToday);
     const minutes = (rows: typeof logList) => rows.reduce((sum, r) => sum + (r.minutes ?? 0), 0);
 
@@ -105,7 +123,7 @@ export const momSpeak = createServerFn({ method: "POST" })
         todayLogs.length ? ` - ${todayLogs.map((l) => `${l.minutes}min ${l.note ?? ""}`.trim()).join(", ")}` : ""
       }.`,
       `Logged in the last 7 days: ${minutes(logList)} minutes across ${logList.length} session(s).`,
-      `Local time where they are: ${new Date().toUTCString()} (UTC).`,
+      `Local time where they are: ${localTime} (${tz}).`,
     ].join("\n");
 
     const task =
