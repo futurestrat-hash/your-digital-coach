@@ -1,4 +1,4 @@
-import { animationClass, momArt, type MomMood } from "@/lib/mom";
+import { momArt, type MomMood } from "@/lib/mom";
 import { cn } from "@/lib/utils";
 
 const MOOD_LABEL: Record<MomMood, string> = {
@@ -14,7 +14,6 @@ export function MomStage({
   name,
   message,
   loading,
-  animation,
   className,
 }: {
   variant: string;
@@ -22,7 +21,6 @@ export function MomStage({
   name: string;
   message?: string | null | undefined;
   loading?: boolean;
-  animation?: string | null | undefined;
   className?: string;
 }) {
   const safeMood = (["happy", "proud", "sad", "upset"].includes(mood) ? mood : "happy") as MomMood;
@@ -36,7 +34,7 @@ export function MomStage({
           alt={`${name} looking ${MOOD_LABEL[safeMood]}`}
           width={768}
           height={1024}
-          className={cn("h-56 w-auto drop-shadow-xl sm:h-72", animationClass(animation))}
+          className="h-56 w-auto drop-shadow-xl sm:h-72"
         />
         <div className="w-full flex-1 sm:mb-8">
           <div className="speech-bubble p-4">

@@ -159,7 +159,6 @@ function Home() {
         name={momName}
         message={latest?.body}
         loading={busy}
-        animation={profile?.animation_pref}
       />
 
       {Array.isArray(latest?.ideas) && (latest.ideas as string[]).length > 0 && (
