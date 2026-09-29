@@ -4,7 +4,8 @@
 
 1. **Mom’s voice**
    - Add a speaker control to each current Mom message.
-   - Generate speech only when the user taps it, using a warm, mature, firm parental delivery—not an exaggerated accent or caricature.
+   - Generate speech only when the user taps it, using a warm, mature, firm parental delivery with a subtle, natural accent. Avoid exaggerated pronunciation, stereotypes, or caricature.
+   - On one or two of the user’s earliest Mom messages, show a brief invitation to tap and listen; afterward, leave the speaker control discoverable without repeating the prompt.
    - Add play, loading, stop, and clear error states.
 
 2. **“Your cousin” benchmark**
