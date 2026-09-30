@@ -1,6 +1,6 @@
 # Roadmap
-
-- [ ] Add Mom voice playback with a subtle, respectful accent and one or two early listening prompts.
-- [ ] Add the unnamed “your cousin” benchmark.
-- [ ] Add opt-in daily reminders based on the user’s local time and activity.
-- [ ] Add weekly sliced-fruit rewards with a clickable cultural explanation.
+- [ ] Add respectful tap-to-hear Mom voice with two early prompts
+- [ ] Add occasional unnamed “your cousin” benchmark
+- [ ] Add opt-in timezone-aware daily browser reminders
+- [ ] Add claim-once weekly sliced-fruit rewards and explanation
+- [ ] Verify signed-in desktop and mobile flows

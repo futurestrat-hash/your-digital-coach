@@ -121,8 +121,11 @@ export type Database = {
           mom_name: string
           mom_variant: string
           onboarded: boolean
+          reminder_enabled: boolean
+          reminder_time: string
           sass_level: number
           timezone: string
+          voice_play_count: number
         }
         Insert: {
           animation_pref?: string
@@ -132,8 +135,11 @@ export type Database = {
           mom_name?: string
           mom_variant?: string
           onboarded?: boolean
+          reminder_enabled?: boolean
+          reminder_time?: string
           sass_level?: number
           timezone?: string
+          voice_play_count?: number
         }
         Update: {
           animation_pref?: string
@@ -143,10 +149,66 @@ export type Database = {
           mom_name?: string
           mom_variant?: string
           onboarded?: boolean
+          reminder_enabled?: boolean
+          reminder_time?: string
           sass_level?: number
           timezone?: string
+          voice_play_count?: number
         }
         Relationships: []
+      }
+      reminder_deliveries: {
+        Row: {
+          delivered_at: string
+          id: string
+          local_date: string
+          user_id: string
+        }
+        Insert: {
+          delivered_at?: string
+          id?: string
+          local_date: string
+          user_id: string
+        }
+        Update: {
+          delivered_at?: string
+          id?: string
+          local_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_reward_claims: {
+        Row: {
+          claimed_at: string
+          goal_id: string
+          id: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          claimed_at?: string
+          goal_id: string
+          id?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          claimed_at?: string
+          goal_id?: string
+          id?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_reward_claims_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
