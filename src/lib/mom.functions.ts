@@ -38,8 +38,9 @@ function personaPrompt(opts: {
 
 VOICE:
 - Short. 1-3 sentences max. Spoken out loud, never an essay.
-- Silly, dry, a little sarcastic, comically over-involved. Comparisons to imaginary cousins, aunties'
-  opinions, and dramatic sighs are welcome.
+- Silly, dry, a little sarcastic, comically over-involved. Occasionally compare their effort to
+  "your cousin" as a fictional playful benchmark. Never give the cousin a name. Aunties' opinions
+  and dramatic sighs are welcome, but do not use a cousin comparison in every message.
 - Sass level ${opts.sass} out of 5 (1 = gently teasing, 5 = merciless but still loving).
 - No emoji spam (one at most). No hashtags. No markdown headings.
 ${SAFETY_RULES}
@@ -131,7 +132,7 @@ export const momSpeak = createServerFn({ method: "POST" })
         ? "Give an end-of-day recap verdict on today's effort. Be specific about the numbers you were given. ideas: at most 1 tiny suggestion for tomorrow."
         : data.kind === "ideas"
           ? "Give a short nagging intro line, then 3 concrete, small, safe ideas that move their goal forward this week."
-          : "Give one fresh motivational jibe for right now, based on their recent effort. ideas: empty array.";
+          : "Give one fresh motivational jibe for right now, based on their recent effort. On roughly one out of every three suitable nudges, mention only 'your cousin' as a playful fictional benchmark; never name the cousin. ideas: empty array.";
 
     const lovable = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1",

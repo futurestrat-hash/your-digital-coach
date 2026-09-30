@@ -41,7 +41,7 @@ export const MOM_VARIANTS: {
 ];
 
 export function getVariant(id: string | null | undefined) {
-  return MOM_VARIANTS.find((v) => v.id === id) ?? MOM_VARIANTS[0]!;
+  return MOM_VARIANTS.find((v) => v.id === id) ?? MOM_VARIANTS[0];
 }
 
 export function momArt(variantId: string | null | undefined, mood: string | null | undefined) {
@@ -114,4 +114,30 @@ export function timezoneLabel(tz: string) {
   } catch {
     return tz;
   }
+}
+
+export function localDateKey(date: Date, timezone: string) {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
+}
+
+export function localWeekStart(date: Date, timezone: string) {
+  const localKey = localDateKey(date, timezone);
+  const localNoon = new Date(`${localKey}T12:00:00Z`);
+  const day = localNoon.getUTCDay();
+  const daysSinceMonday = (day + 6) % 7;
+  localNoon.setUTCDate(localNoon.getUTCDate() - daysSinceMonday);
+  return localNoon.toISOString().slice(0, 10);
+}
+
+export function shouldShowVoiceHint(playCount: number | null | undefined) {
+  return (playCount ?? 0) < 2;
 }
