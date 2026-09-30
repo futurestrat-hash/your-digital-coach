@@ -84,6 +84,8 @@
   --gold: oklch(0.833 0.135 84.5);
   --gold-foreground: oklch(0.28 0.05 45);
   --jade: oklch(0.63 0.11 165);
+  --fruit-surface: oklch(0.955 0.06 92);
+  --fruit-border: oklch(0.76 0.12 72);
   --gradient-paper: radial-gradient(
     circle at 20% 0%,
     oklch(0.96 0.045 84.5) 0%,
@@ -183,4 +185,23 @@
   border: 2px solid var(--color-ink);
   border-radius: var(--radius-xl);
   box-shadow: 4px 4px 0 0 var(--color-ink);
+}
+
+@utility fruit-reward {
+  background-color: var(--fruit-surface);
+  border: 2px solid var(--fruit-border);
+  box-shadow: var(--shadow-card);
+}
+
+@utility voice-hint {
+  animation: voice-hint-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes voice-hint-pulse {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-hint { animation: none; }
 }

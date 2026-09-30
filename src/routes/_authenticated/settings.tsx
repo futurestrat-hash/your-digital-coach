@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import {
   MOM_VARIANTS,
@@ -40,6 +41,8 @@ function Settings() {
   const [sass, setSass] = useState(3);
   const [timezone, setTimezone] = useState(detectTimezone);
   const [newGoal, setNewGoal] = useState("");
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState("20:00");
 
   const profileQuery = useQuery({
     queryKey: ["profile", userId],
@@ -71,6 +74,8 @@ function Settings() {
       setMomName(p.mom_name ?? "Mom");
       setSass(p.sass_level ?? 3);
       setTimezone(p.timezone ?? detectTimezone());
+      setReminderEnabled(p.reminder_enabled ?? false);
+      setReminderTime(p.reminder_time ?? "20:00");
     }
   }, [profileQuery.data]);
 
@@ -82,6 +87,8 @@ function Settings() {
         mom_name: momName.trim() || "Mom",
         sass_level: sass,
         timezone,
+        reminder_enabled: reminderEnabled,
+        reminder_time: reminderTime,
       })
       .eq("id", userId);
     if (error) {
@@ -90,6 +97,22 @@ function Settings() {
     }
     queryClient.invalidateQueries({ queryKey: ["profile", userId] });
     toast.success("She has been updated.");
+  }
+
+  async function toggleReminder(enabled: boolean) {
+    if (enabled) {
+      if (!("Notification" in window)) {
+        toast.error("This browser does not support notifications.");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        toast.error("Notifications are blocked in your browser settings.");
+        return;
+      }
+      await navigator.serviceWorker?.register("/tiger-mom-sw.js");
+    }
+    setReminderEnabled(enabled);
   }
 
   async function addGoal() {
@@ -188,6 +211,21 @@ function Settings() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="border-t border-border pt-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <Label htmlFor="daily-reminder">Daily reminder</Label>
+              <p className="text-xs text-muted-foreground">Only when you have not logged anything that day.</p>
+            </div>
+            <Switch id="daily-reminder" checked={reminderEnabled} onCheckedChange={toggleReminder} />
+          </div>
+          {reminderEnabled && (
+            <div className="mt-4 max-w-44 space-y-1.5">
+              <Label htmlFor="reminder-time">Remind me at</Label>
+              <Input id="reminder-time" type="time" value={reminderTime} onChange={(event) => setReminderTime(event.target.value)} />
+            </div>
+          )}
         </div>
         <Button onClick={saveProfile}>Save</Button>
       </div>
