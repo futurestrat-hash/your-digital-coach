@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { getReminderPublicKey } from "@/lib/reminders.functions";
 import {
   MOM_VARIANTS,
   SASS_LABELS,
@@ -35,6 +37,7 @@ function Settings() {
   const { userId } = Route.useRouteContext();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const getPublicKey = useServerFn(getReminderPublicKey);
 
   const [variant, setVariant] = useState<MomVariantId>("a");
   const [momName, setMomName] = useState("Mom");
@@ -110,7 +113,23 @@ function Settings() {
         toast.error("Notifications are blocked in your browser settings.");
         return;
       }
-      await navigator.serviceWorker?.register("/tiger-mom-sw.js");
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        toast.error("Background reminders are not supported in this browser.");
+        return;
+      }
+      const registration = await navigator.serviceWorker.register("/tiger-mom-sw.js");
+      const { publicKey } = await getPublicKey();
+      const bytes = Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(publicKey.length / 4) * 4, "=")), (character) => character.charCodeAt(0));
+      const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes });
+      const json = subscription.toJSON();
+      if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) throw new Error("Browser reminder setup was incomplete.");
+      const { error } = await supabase.from("push_subscriptions").upsert({
+        user_id: userId,
+        endpoint: json.endpoint,
+        p256dh: json.keys.p256dh,
+        auth: json.keys.auth,
+      }, { onConflict: "user_id,endpoint" });
+      if (error) throw error;
     }
     setReminderEnabled(enabled);
   }
