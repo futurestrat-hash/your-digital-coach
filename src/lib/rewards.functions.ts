@@ -4,6 +4,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { localWeekStart } from "@/lib/mom";
 
+function localWeekStartUtc(weekStart: string, timezone: string) {
+  const noon = new Date(`${weekStart}T12:00:00Z`);
+  const offset = new Intl.DateTimeFormat("en-US", { timeZone: timezone, timeZoneName: "longOffset" })
+    .formatToParts(noon)
+    .find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "+00:00";
+  return new Date(`${weekStart}T00:00:00${offset}`).toISOString();
+}
+
 export const claimWeeklyReward = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ goalId: z.string().uuid() }).parse(input))
@@ -20,7 +28,7 @@ export const claimWeeklyReward = createServerFn({ method: "POST" })
       .select("minutes")
       .eq("user_id", userId)
       .eq("goal_id", goal.id)
-      .gte("logged_at", `${weekStart}T00:00:00Z`);
+      .gte("logged_at", localWeekStartUtc(weekStart, profile.timezone));
     if (logsError) throw logsError;
     const minutes = (logs ?? []).reduce((sum, log) => sum + log.minutes, 0);
     if (minutes < goal.weekly_minutes_target) throw new Error("Not quite yet. Mom is still slicing.");

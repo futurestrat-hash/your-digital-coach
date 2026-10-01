@@ -24,6 +24,18 @@ function localParts(now: Date, timezone: string) {
   return { date: `${read("year")}-${read("month")}-${read("day")}`, time: `${read("hour")}:${read("minute")}` };
 }
 
+function minutesOfDay(value: string) {
+  const [hours = "0", minutes = "0"] = value.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}
+
+function localDayStartUtc(now: Date, timezone: string, localDate: string) {
+  const offset = new Intl.DateTimeFormat("en-US", { timeZone: timezone, timeZoneName: "longOffset" })
+    .formatToParts(now)
+    .find((part) => part.type === "timeZoneName")?.value.replace("GMT", "") || "+00:00";
+  return new Date(`${localDate}T00:00:00${offset}`);
+}
+
 export const Route = createFileRoute("/api/public/reminders")({
   server: {
     handlers: {
@@ -46,7 +58,9 @@ export const Route = createFileRoute("/api/public/reminders")({
 
         for (const profile of profiles ?? []) {
           const local = localParts(now, profile.timezone);
-          if (local.time < profile.reminder_time || local.time >= `${profile.reminder_time.slice(0, 3)}${String(Number(profile.reminder_time.slice(3)) + 10).padStart(2, "0")}`) continue;
+          const currentMinute = minutesOfDay(local.time);
+          const reminderMinute = minutesOfDay(profile.reminder_time);
+          if (currentMinute < reminderMinute || currentMinute >= reminderMinute + 10) continue;
           const { data: exists } = await supabaseAdmin
             .from("reminder_deliveries")
             .select("id")
@@ -54,12 +68,12 @@ export const Route = createFileRoute("/api/public/reminders")({
             .eq("local_date", local.date)
             .maybeSingle();
           if (exists) continue;
-          const localStart = new Date(`${local.date}T00:00:00Z`);
+          const localStart = localDayStartUtc(now, profile.timezone, local.date);
           const { count } = await supabaseAdmin
             .from("activity_logs")
             .select("id", { count: "exact", head: true })
             .eq("user_id", profile.id)
-            .gte("logged_at", new Date(localStart.getTime() - 14 * 3600e3).toISOString());
+            .gte("logged_at", localStart.toISOString());
           if ((count ?? 0) > 0) continue;
           let sent = false;
           for (const row of profile.push_subscriptions ?? []) {

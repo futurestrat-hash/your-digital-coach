@@ -169,9 +169,10 @@ function Home() {
   const claimedGoalIds = new Set(
     (claimsQuery.data ?? []).filter((claim) => claim.week_start === weekStart).map((claim) => claim.goal_id),
   );
+  const weekStartApproximation = new Date(`${weekStart}T00:00:00Z`);
   const qualifiedGoals = (goalsQuery.data ?? []).filter((goal) => {
     const goalMinutes = logs
-      .filter((log) => log.goal_id === goal.id && new Date(log.logged_at) >= new Date(`${weekStart}T00:00:00Z`))
+      .filter((log) => log.goal_id === goal.id && new Date(log.logged_at) >= weekStartApproximation)
       .reduce((sum, log) => sum + log.minutes, 0);
     return goalMinutes >= goal.weekly_minutes_target;
   });
