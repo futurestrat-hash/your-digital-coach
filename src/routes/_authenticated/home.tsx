@@ -3,11 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Info } from "lucide-react";
 
+import fruitReward from "@/assets/sliced-fruit-reward.png";
 import { MomStage } from "@/components/MomStage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -17,7 +20,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { momSpeak } from "@/lib/mom.functions";
-import { getVariant } from "@/lib/mom";
+import { getVariant, localWeekStart, shouldShowVoiceHint } from "@/lib/mom";
+import { claimWeeklyReward } from "@/lib/rewards.functions";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -39,6 +43,7 @@ function Home() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const speak = useServerFn(momSpeak);
+  const claimReward = useServerFn(claimWeeklyReward);
 
   const [minutes, setMinutes] = useState("30");
   const [goalId, setGoalId] = useState<string>("");
@@ -95,6 +100,15 @@ function Home() {
     },
   });
 
+  const claimsQuery = useQuery({
+    queryKey: ["reward-claims", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("weekly_reward_claims").select("*").eq("user_id", userId);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const profile = profileQuery.data;
 
   useEffect(() => {
@@ -130,6 +144,15 @@ function Home() {
     onError: () => toast.error("She's speechless (something went wrong). Try again."),
   });
 
+  const rewardMutation = useMutation({
+    mutationFn: (rewardGoalId: string) => claimReward({ data: { goalId: rewardGoalId } }),
+    onSuccess: () => {
+      toast.success("Sliced fruit earned. Mom is extremely normal about this.");
+      queryClient.invalidateQueries({ queryKey: ["reward-claims", userId] });
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Couldn't claim that reward."),
+  });
+
   const logs = logsQuery.data ?? [];
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
@@ -142,6 +165,24 @@ function Home() {
   const busy = speakMutation.isPending || logMutation.isPending;
   const momName = profile?.mom_name ?? "Mom";
   const variant = profile?.mom_variant ?? "a";
+  const weekStart = localWeekStart(new Date(), profile?.timezone ?? "UTC");
+  const claimedGoalIds = new Set(
+    (claimsQuery.data ?? []).filter((claim) => claim.week_start === weekStart).map((claim) => claim.goal_id),
+  );
+  const weekStartApproximation = new Date(`${weekStart}T00:00:00Z`);
+  const qualifiedGoals = (goalsQuery.data ?? []).filter((goal) => {
+    const goalMinutes = logs
+      .filter((log) => log.goal_id === goal.id && new Date(log.logged_at) >= weekStartApproximation)
+      .reduce((sum, log) => sum + log.minutes, 0);
+    return goalMinutes >= goal.weekly_minutes_target;
+  });
+
+  async function noteVoiceStarted() {
+    if (!profile || profile.voice_play_count >= 2) return;
+    const next = profile.voice_play_count + 1;
+    await supabase.from("profiles").update({ voice_play_count: next }).eq("id", userId);
+    queryClient.setQueryData(["profile", userId], { ...profile, voice_play_count: next });
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-8">
@@ -159,6 +200,8 @@ function Home() {
         name={momName}
         message={latest?.body}
         loading={busy}
+        showVoiceHint={shouldShowVoiceHint(profile?.voice_play_count)}
+        onVoiceStarted={noteVoiceStarted}
       />
 
       {Array.isArray(latest?.ideas) && (latest.ideas as string[]).length > 0 && (
@@ -189,6 +232,35 @@ function Home() {
         <Stat label="This week" value={`${weekMinutes} min`} />
         <Stat label="Active days (7d)" value={`${activeDays}`} />
       </section>
+
+      {qualifiedGoals.length > 0 && (
+        <section className="fruit-reward mt-6 grid items-center gap-4 rounded-lg p-5 sm:grid-cols-[9rem_1fr]">
+          <img src={fruitReward} alt="A plate of carefully sliced fruit" loading="lazy" width={1024} height={1024} className="mx-auto h-32 w-32 object-contain" />
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wide text-primary">Weekly reward</p>
+            <h2 className="font-display text-2xl font-bold">Mom cut fruit for you.</h2>
+            <p className="mt-1 text-sm text-muted-foreground">You met this week's goal. Do not make a big deal out of it. She certainly won't.</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {qualifiedGoals.map((goal) => (
+                <Button key={goal.id} size="sm" disabled={claimedGoalIds.has(goal.id) || rewardMutation.isPending} onClick={() => rewardMutation.mutate(goal.id)}>
+                  {claimedGoalIds.has(goal.id) ? `${goal.title}: claimed` : `Claim for ${goal.title}`}
+                </Button>
+              ))}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Why sliced fruit?" title="Why sliced fruit?">
+                    <Info />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <p className="font-display font-bold">The ultimate unspoken Asian parent apology and love language.</p>
+                  <p className="mt-2 text-sm text-muted-foreground">No speech. No emotional summit. Just a quiet plate of fruit placed beside you: I noticed, I care, and please eat something.</p>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="paper-card mt-6 p-5">
         <h2 className="font-display text-xl font-bold">What did you just do?</h2>
