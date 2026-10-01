@@ -40,8 +40,10 @@ export const MOM_VARIANTS: {
   },
 ];
 
+const DEFAULT_MOM_VARIANT = MOM_VARIANTS[0] as (typeof MOM_VARIANTS)[number];
+
 export function getVariant(id: string | null | undefined) {
-  return MOM_VARIANTS.find((v) => v.id === id) ?? MOM_VARIANTS[0];
+  return MOM_VARIANTS.find((v) => v.id === id) ?? DEFAULT_MOM_VARIANT;
 }
 
 export function momArt(variantId: string | null | undefined, mood: string | null | undefined) {

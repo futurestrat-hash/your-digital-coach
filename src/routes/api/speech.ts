@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/speech")({
           auth: { persistSession: false, autoRefreshToken: false },
         });
         const { data: claims, error: authError } = await auth.auth.getClaims(token);
-        if (authError || !claims.claims?.sub) return new Response("Please sign in again.", { status: 401 });
+        if (authError || !claims?.claims?.sub) return new Response("Please sign in again.", { status: 401 });
 
         const parsed = SpeechInput.safeParse(await request.json().catch(() => null));
         if (!parsed.success) return new Response("That message cannot be read aloud.", { status: 400 });
