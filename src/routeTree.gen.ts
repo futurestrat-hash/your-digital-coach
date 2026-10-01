@@ -16,6 +16,7 @@ import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/h
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ApiSpeechRouteImport } from './routes/api/speech'
+import { Route as ApiPublicRemindersRouteImport } from './routes/api/public/reminders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const ApiSpeechRoute = ApiSpeechRouteImport.update({
   path: '/api/speech',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRemindersRoute = ApiPublicRemindersRouteImport.update({
+  id: '/api/public/reminders',
+  path: '/api/public/reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/speech': typeof ApiSpeechRoute
+  '/api/public/reminders': typeof ApiPublicRemindersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/speech': typeof ApiSpeechRoute
+  '/api/public/reminders': typeof ApiPublicRemindersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,13 +85,27 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/api/speech': typeof ApiSpeechRoute
+  '/api/public/reminders': typeof ApiPublicRemindersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/home' | '/onboarding' | '/settings' | '/api/speech'
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/onboarding'
+    | '/settings'
+    | '/api/speech'
+    | '/api/public/reminders'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/home' | '/onboarding' | '/settings' | '/api/speech'
+  to:
+    | '/'
+    | '/auth'
+    | '/home'
+    | '/onboarding'
+    | '/settings'
+    | '/api/speech'
+    | '/api/public/reminders'
   id:
     | '__root__'
     | '/'
@@ -93,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
     | '/api/speech'
+    | '/api/public/reminders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +123,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
+  ApiPublicRemindersRoute: typeof ApiPublicRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -153,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSpeechRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/reminders': {
+      id: '/api/public/reminders'
+      path: '/api/public/reminders'
+      fullPath: '/api/public/reminders'
+      preLoaderRoute: typeof ApiPublicRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -177,6 +208,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiSpeechRoute: ApiSpeechRoute,
+  ApiPublicRemindersRoute: ApiPublicRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
