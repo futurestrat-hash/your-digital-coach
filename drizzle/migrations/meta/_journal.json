@@ -29,6 +29,13 @@
       "when": 1790727570433,
       "tag": "0003_add_reminders_and_weekly_rewards",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790812912290,
+      "tag": "0004_add_browser_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }
