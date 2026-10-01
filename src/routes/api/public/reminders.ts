@@ -50,7 +50,7 @@ export const Route = createFileRoute("/api/public/reminders")({
         const now = new Date();
         const { data: profiles, error } = await supabaseAdmin
           .from("profiles")
-          .select("id, mom_name, timezone, reminder_time, push_subscriptions(*)")
+          .select("id, mom_name, timezone, reminder_time")
           .eq("reminder_enabled", true);
         if (error) return new Response(error.message, { status: 500 });
         const publicKey = base64Url(p256.getPublicKey(decodePrivateKey(privateKey), false));
@@ -75,8 +75,12 @@ export const Route = createFileRoute("/api/public/reminders")({
             .eq("user_id", profile.id)
             .gte("logged_at", localStart.toISOString());
           if ((count ?? 0) > 0) continue;
+          const { data: subscriptions } = await supabaseAdmin
+            .from("push_subscriptions")
+            .select("id, endpoint, p256dh, auth")
+            .eq("user_id", profile.id);
           let sent = false;
-          for (const row of profile.push_subscriptions ?? []) {
+          for (const row of subscriptions ?? []) {
             const subscription: PushSubscription = {
               endpoint: row.endpoint,
               expirationTime: null,

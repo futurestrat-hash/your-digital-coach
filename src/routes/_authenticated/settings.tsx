@@ -122,12 +122,12 @@ function Settings() {
       const bytes = Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(publicKey.length / 4) * 4, "=")), (character) => character.charCodeAt(0));
       const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes });
       const json = subscription.toJSON();
-      if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) throw new Error("Browser reminder setup was incomplete.");
+      if (!json.endpoint || !json.keys?.["p256dh"] || !json.keys["auth"]) throw new Error("Browser reminder setup was incomplete.");
       const { error } = await supabase.from("push_subscriptions").upsert({
         user_id: userId,
         endpoint: json.endpoint,
-        p256dh: json.keys.p256dh,
-        auth: json.keys.auth,
+        p256dh: json.keys["p256dh"],
+        auth: json.keys["auth"],
       }, { onConflict: "user_id,endpoint" });
       if (error) throw error;
     }
