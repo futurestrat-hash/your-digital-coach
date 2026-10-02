@@ -187,7 +187,11 @@ function Home() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-8">
       <header className="flex items-center justify-between">
-        <span className="font-display text-xl font-extrabold text-primary">Tiger Mom</span>
+        <div>
+          <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Tiger Mom</span>
+          <h1 className="font-display text-2xl font-extrabold text-primary">Today with Mom</h1>
+        </div>
+
         <Button asChild variant="outline" size="sm">
           <Link to="/settings">Settings</Link>
         </Button>
