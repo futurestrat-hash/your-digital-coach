@@ -8,6 +8,22 @@ import { Info } from "lucide-react";
 import fruitReward from "@/assets/sliced-fruit-reward.png";
 import { MomStage } from "@/components/MomStage";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+const EXCUSES = [
+  "I'm too tired from work",
+  "I had no time today",
+  "I'll start tomorrow",
+  "I wasn't in the mood",
+  "I'm not feeling well",
+];
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -139,10 +155,19 @@ function Home() {
   });
 
   const speakMutation = useMutation({
-    mutationFn: (kind: "nudge" | "recap" | "ideas") => speak({ data: { kind } }),
+    mutationFn: (input: "nudge" | "recap" | "ideas" | { kind: "excuse"; excuse: string }) =>
+      speak({ data: typeof input === "string" ? { kind: input } : input }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["messages", userId] }),
     onError: () => toast.error("She's speechless (something went wrong). Try again."),
   });
+
+  const [excuseOpen, setExcuseOpen] = useState(false);
+  const [excuse, setExcuse] = useState("");
+  function submitExcuse(text: string) {
+    setExcuseOpen(false);
+    setExcuse("");
+    speakMutation.mutate({ kind: "excuse", excuse: text });
+  }
 
   const rewardMutation = useMutation({
     mutationFn: (rewardGoalId: string) => claimReward({ data: { goalId: rewardGoalId } }),
@@ -229,6 +254,44 @@ function Home() {
         <Button variant="outline" onClick={() => speakMutation.mutate("recap")} disabled={busy}>
           Recap my day
         </Button>
+        <Dialog open={excuseOpen} onOpenChange={setExcuseOpen}>
+          <DialogTrigger asChild>
+            <Button variant="ghost" disabled={busy}>
+              Make an excuse
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Make an excuse</DialogTitle>
+              <DialogDescription>Go ahead. {momName} is listening. Skeptically.</DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-wrap gap-2">
+              {EXCUSES.map((e) => (
+                <Button key={e} size="sm" variant="outline" onClick={() => submitExcuse(e)}>
+                  {e}
+                </Button>
+              ))}
+            </div>
+            <form
+              className="flex gap-2"
+              onSubmit={(ev) => {
+                ev.preventDefault();
+                if (excuse.trim()) submitExcuse(excuse.trim());
+              }}
+            >
+              <Input
+                value={excuse}
+                maxLength={200}
+                onChange={(ev) => setExcuse(ev.target.value)}
+                placeholder="Or type your own…"
+                aria-label="Your excuse"
+              />
+              <Button type="submit" disabled={!excuse.trim()}>
+                Tell her
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-3">
