@@ -9,16 +9,35 @@ import heroMom from "@/assets/mom-a-upset.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tiger Mom — your adopted digital nag" },
+      { title: "Tiger Mom App — Playful Motivation for Your Goals" },
       {
         name: "description",
         content:
-          "Adopt an anime tiger mom who teases, nags and celebrates you until your goal actually happens.",
+          "Tiger Mom app pairs an anime-style digital mom with your goals. Log practice, get playful motivation and ideas, and earn her pride one small step at a time.",
       },
-      { property: "og:title", content: "Tiger Mom — your adopted digital nag" },
+      { property: "og:title", content: "Tiger Mom App — Playful Motivation for Your Goals" },
       {
         property: "og:description",
-        content: "Pick your tiger mom, name your goal, and get lovingly harassed into progress.",
+        content: "Choose your digital mom, track your effort, and get affectionate teasing and small ideas for your goals with the Tiger Mom app.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://tiger-mom.lovable.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://tiger-mom.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "Tiger Mom App",
+          url: "https://tiger-mom.lovable.app/",
+          description:
+            "A goal-motivation app with an anime-style digital mom, playful check-ins, practice logging, and daily recaps.",
+          applicationCategory: "LifestyleApplication",
+          operatingSystem: "Web browser",
+        }),
       },
     ],
   }),
@@ -54,12 +73,13 @@ function Landing() {
       <section className="mt-8 grid items-center gap-8 md:grid-cols-2">
         <div>
           <h1 className="font-display text-4xl leading-tight font-extrabold text-foreground sm:text-5xl">
-            Adopt a tiger mom.
+            Tiger Mom App.
             <span className="block text-primary">Regret it immediately.</span>
           </h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Tell her what you're working on. She'll check in with silly, slightly sarcastic jibes,
-            hand you small ideas, and deliver a verdict on your day. Kind underneath. Mostly.
+            Adopt a digital mom for your goals — learning Japanese, practising an instrument, or
+            working toward a promotion. Log your effort, get silly, slightly sarcastic jibes and
+            small ideas, and hear her verdict on your day. Kind underneath. Mostly.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild size="lg">
