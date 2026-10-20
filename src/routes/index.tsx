@@ -74,8 +74,11 @@ function Landing() {
         <div>
           <h1 className="font-display text-4xl leading-tight font-extrabold text-foreground sm:text-5xl">
             Tiger Mom App.
-            <span className="block text-primary">Regret it immediately.</span>
           </h1>
+          <p className="mt-2 font-display text-3xl leading-snug font-extrabold text-primary sm:text-4xl">
+            Adopt a tiger mom.
+            <span className="block">Regret it immediately.</span>
+          </p>
           <p className="mt-4 text-lg text-muted-foreground">
             Adopt a digital mom for your goals — learning Japanese, practising an instrument, or
             working toward a promotion. Log your effort, get silly, slightly sarcastic jibes and
