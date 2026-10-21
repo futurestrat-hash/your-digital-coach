@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Fix repeated onboarding and duplicate goal submissions
+- [x] Add goal editing and verify removal in Settings
 - [x] Add respectful tap-to-hear Mom voice with two early prompts
 - [x] Add occasional unnamed “your cousin” benchmark
 - [x] Add opt-in timezone-aware daily browser reminders

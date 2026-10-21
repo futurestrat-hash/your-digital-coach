@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
   type MomVariantId,
 } from "@/lib/mom";
 import { cn } from "@/lib/utils";
+import { uniqueGoalTitles } from "@/lib/goals";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -26,6 +28,8 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
       { name: "description", content: "Pick your tiger mom, name her, and tell her your goal." },
       { property: "og:title", content: "Adopt your tiger mom" },
       { property: "og:description", content: "Choose her look, her sass level, and your goal." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Onboarding,
@@ -33,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/onboarding")({
 
 function Onboarding() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const submitting = useRef(false);
   const { userId } = Route.useRouteContext();
   const [step, setStep] = useState(0);
   const [variant, setVariant] = useState<MomVariantId>("a");
@@ -44,7 +50,7 @@ function Onboarding() {
   const [detail, setDetail] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const goals = [...picked, ...(customGoal.trim() ? [customGoal.trim()] : [])];
+  const goals = uniqueGoalTitles([...picked, customGoal]);
 
   function togglePreset(title: string) {
     setPicked((prev) =>
@@ -53,13 +59,40 @@ function Onboarding() {
   }
 
   async function finish() {
+    if (submitting.current) return;
     if (goals.length === 0) {
       toast.error("Give her at least one goal to nag you about.");
       return;
     }
+    submitting.current = true;
     setSaving(true);
     try {
-      const { error: profileError } = await supabase
+      const { data: currentProfile, error: readError } = await supabase
+        .from("profiles").select("*").eq("id", userId).single();
+      if (readError) throw readError;
+      if (currentProfile.onboarded) {
+        await queryClient.cancelQueries({ queryKey: ["profile", userId] });
+        queryClient.setQueryData(["profile", userId], currentProfile);
+        await navigate({ to: "/home", replace: true });
+        return;
+      }
+
+      const { data: existingGoals, error: readGoalsError } = await supabase
+        .from("goals").select("title").eq("user_id", userId).eq("archived", false);
+      if (readGoalsError) throw readGoalsError;
+      const rows = uniqueGoalTitles(goals, (existingGoals ?? []).map((g) => g.title)).map((title) => ({
+        user_id: userId,
+        title,
+        category: GOAL_PRESETS.find((p) => p.title === title)?.category ?? "other",
+        detail: detail.trim() || null,
+      }));
+      if (rows.length > 0) {
+        const { error: goalError } = await supabase.from("goals").insert(rows);
+        if (goalError) throw goalError;
+      }
+
+      await queryClient.cancelQueries({ queryKey: ["profile", userId] });
+      const { data: savedProfile, error: profileError } = await supabase
         .from("profiles")
         .update({
           mom_variant: variant,
@@ -68,22 +101,15 @@ function Onboarding() {
           timezone,
           onboarded: true,
         })
-        .eq("id", userId);
+        .eq("id", userId).select("*").single();
       if (profileError) throw profileError;
-
-      const rows = goals.map((title) => ({
-        user_id: userId,
-        title,
-        category: GOAL_PRESETS.find((p) => p.title === title)?.category ?? "other",
-        detail: detail.trim() || null,
-      }));
-      const { error: goalError } = await supabase.from("goals").insert(rows);
-      if (goalError) throw goalError;
-
-      navigate({ to: "/home", replace: true });
+      queryClient.setQueryData(["profile", userId], savedProfile);
+      await queryClient.invalidateQueries({ queryKey: ["goals", userId] });
+      await navigate({ to: "/home", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't save that.");
     } finally {
+      submitting.current = false;
       setSaving(false);
     }
   }
