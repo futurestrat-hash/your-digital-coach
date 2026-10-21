@@ -49,6 +49,8 @@ export const Route = createFileRoute("/_authenticated/home")({
       },
       { property: "og:title", content: "Today with Mom" },
       { property: "og:description", content: "Log your effort. Receive judgment. Improve." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,

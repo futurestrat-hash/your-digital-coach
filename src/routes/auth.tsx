@@ -17,6 +17,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to check in with your adopted digital tiger mom." },
       { property: "og:title", content: "Sign in — Tiger Mom" },
       { property: "og:description", content: "Your tiger mom is waiting. She has been waiting." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
