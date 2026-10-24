@@ -7,6 +7,7 @@ import { Info } from "lucide-react";
 
 import fruitReward from "@/assets/sliced-fruit-reward.png";
 import { MomStage } from "@/components/MomStage";
+import { ReportCard } from "@/components/ReportCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -301,6 +302,24 @@ function Home() {
         <Stat label="This week" value={`${weekMinutes} min`} />
         <Stat label="Active days (7d)" value={`${activeDays}`} />
       </section>
+
+      <ReportCard
+        variant={variant}
+        momName={momName}
+        firstName={(profile?.display_name ?? "You").trim().split(/\s+/)[0] || "You"}
+        weekMinutes={logs
+          .filter((log) => new Date(log.logged_at) >= weekStartApproximation)
+          .reduce((sum, log) => sum + (log.minutes ?? 0), 0)}
+        targetMinutes={(goalsQuery.data ?? []).reduce((sum, goal) => sum + goal.weekly_minutes_target, 0)}
+        activeDays={
+          new Set(
+            logs
+              .filter((log) => new Date(log.logged_at) >= weekStartApproximation)
+              .map((log) => new Date(log.logged_at).toDateString()),
+          ).size
+        }
+        weekStart={weekStart}
+      />
 
       {qualifiedGoals.length > 0 && (
         <section className="fruit-reward mt-6 grid items-center gap-4 rounded-lg p-5 sm:grid-cols-[9rem_1fr]">
