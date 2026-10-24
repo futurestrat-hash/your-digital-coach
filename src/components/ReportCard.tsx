@@ -32,12 +32,25 @@ export function ReportCard({
 
   const shareText = `My Tiger Mom report card: ${card.grade} — "${card.verdict}" ${weekMinutes} min logged this week toward ${targetMinutes} min. ${SITE_URL}`;
 
+  async function cardPng(): Promise<Blob> {
+    if (!cardRef.current) throw new Error("missing card");
+    const { toBlob } = await import("html-to-image");
+    const blob = await toBlob(cardRef.current, { pixelRatio: 2 });
+    if (!blob) throw new Error("render failed");
+    return blob;
+  }
+
   async function copyText() {
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Copied. Mom expects you to show everyone.");
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": await cardPng() })]);
+      toast.success("Copied the image. Mom expects you to show everyone.");
     } catch {
-      toast.error("Couldn't copy that. Select the text instead.");
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast.info("Your browser blocked image copying, so the text version was copied instead.");
+      } catch {
+        toast.error("Couldn't copy that. Try 'Save as image' instead.");
+      }
     }
   }
 
