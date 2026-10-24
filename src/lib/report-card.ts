@@ -20,7 +20,7 @@ const GRADE_TABLE: { min: number; grade: ReportGrade; verdict: string; mood: Mom
 
 export function computeReportCard(weekMinutes: number, targetMinutes: number): ReportCard {
   const safeTarget = Math.max(0, targetMinutes);
-  const percent = safeTarget === 0 ? 0 : Math.round((Math.max(0, weekMinutes) / safeTarget) * 100);
+  const percent = safeTarget === 0 ? 0 : Math.floor((Math.max(0, weekMinutes) / safeTarget) * 100);
   const row = GRADE_TABLE.find((r) => percent >= r.min) ?? GRADE_TABLE[GRADE_TABLE.length - 1]!;
   return { grade: row.grade, verdict: row.verdict, mood: row.mood, percent };
 }
