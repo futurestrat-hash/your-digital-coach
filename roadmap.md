@@ -6,4 +6,5 @@
 - [x] Add opt-in timezone-aware daily browser reminders
 - [x] Add claim-once weekly sliced-fruit rewards and explanation
 - [x] Verify signed-in desktop and mobile flows
+- [x] Add private weekly report card on Home with copy-text and save-image buttons (no public page)
 - [ ] Activate automatic reminder delivery — blocked until the app is published and its signed schedule can target the live address
