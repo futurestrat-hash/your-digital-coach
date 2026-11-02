@@ -8,6 +8,4 @@
 - [x] Verify signed-in desktop and mobile flows
 - [x] Add private weekly report card on Home with copy-text and save-image buttons (no public page)
 - [ ] Add "Study with Mom" focus timer with in-voice length names (Warm-up / The sit-down / Serious effort), away detection and auto-logging
-- [ ] Add photo "proof of work": Mom inspects a photo and reacts; the photo itself is not kept
-- [ ] Add daily "cousin watch" bulletin — one satirical, unnamed-cousin achievement per day
 - [ ] Activate automatic reminder delivery — blocked until the app is published and its signed schedule can target the live address
