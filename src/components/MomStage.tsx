@@ -29,8 +29,8 @@ export function MomStage({
   name: string;
   message?: string | null | undefined;
   loading?: boolean;
-  showVoiceHint?: boolean;
-  onVoiceStarted?: () => void;
+  showVoiceHint?: boolean | undefined;
+  onVoiceStarted?: (() => void) | undefined;
   className?: string;
 }) {
   const safeMood = (["happy", "proud", "sad", "upset"].includes(mood) ? mood : "happy") as MomMood;
