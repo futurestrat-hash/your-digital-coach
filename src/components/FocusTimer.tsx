@@ -183,6 +183,10 @@ export function FocusTimer({
     if (phase !== "running") return;
     let hiddenAt: number | null = null;
     const onVisibility = () => {
+      (window as unknown as { __awayLog?: string[] }).__awayLog = [
+        ...((window as unknown as { __awayLog?: string[] }).__awayLog ?? []),
+        `hidden=${document.hidden}`,
+      ];
       if (document.hidden) hiddenAt = Date.now();
       else if (hiddenAt !== null) {
         bumpAway((Date.now() - hiddenAt) / 1000);
