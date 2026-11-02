@@ -6,8 +6,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const SpeakInput = z.object({
-  kind: z.enum(["nudge", "recap", "ideas", "excuse"]),
+  kind: z.enum(["nudge", "recap", "ideas", "excuse", "focus_start", "focus_done"]),
   excuse: z.string().trim().max(200).optional(),
+  focusMinutes: z.number().int().min(1).max(600).optional(),
+  focusGoalTitle: z.string().trim().max(120).optional(),
+  focusAwaySeconds: z.number().int().min(0).max(86400).optional(),
 });
 
 type MomReply = { body: string; mood: string; ideas: string[] };
@@ -135,7 +138,15 @@ export const momSpeak = createServerFn({ method: "POST" })
         ? "Give an end-of-day recap verdict on today's effort. Be specific about the numbers you were given. ideas: at most 1 tiny suggestion for tomorrow."
         : data.kind === "ideas"
           ? "Give a short nagging intro line, then 3 concrete, small, safe ideas that move their goal forward this week."
-          : "Give one fresh motivational jibe for right now, based on their recent effort. On roughly one out of every three suitable nudges, mention only 'your cousin' as a playful fictional benchmark; never name the cousin. ideas: empty array.";
+          : data.kind === "focus_start"
+            ? `They are about to sit down for a ${data.focusMinutes ?? 25}-minute focus session${
+                data.focusGoalTitle ? ` on their goal "${data.focusGoalTitle}"` : ""
+              }. Open with one short line that sets the terms: phone away, water within reach, they stay in the chair until the timer ends. Warm, firm, zero negotiation. ideas: exactly 1 tiny prep step they can do in under a minute.`
+            : data.kind === "focus_done"
+              ? `They just finished a focus session of ${data.focusMinutes ?? 25} minutes${
+                  data.focusGoalTitle ? ` on their goal "${data.focusGoalTitle}"` : ""
+                }. During it they were away from the page for ${data.focusAwaySeconds ?? 0} seconds. Judge what they actually did: if they barely left, be plainly proud and say the number of minutes out loud; if they drifted or disappeared, be gently suspicious and tease the wandering, never the person. You may use the unnamed "your cousin" benchmark. mood: "proud" when they stayed, "sad" or "upset" when they wandered. ideas: at most 1 tiny next step.`
+              : "Give one fresh motivational jibe for right now, based on their recent effort. On roughly one out of every three suitable nudges, mention only 'your cousin' as a playful fictional benchmark; never name the cousin. ideas: empty array.";
 
     const lovable = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1",
