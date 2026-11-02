@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Info } from "lucide-react";
 
 import fruitReward from "@/assets/sliced-fruit-reward.png";
+import { FocusTimer } from "@/components/FocusTimer";
 import { MomStage } from "@/components/MomStage";
 import { ReportCard } from "@/components/ReportCard";
 import { Button } from "@/components/ui/button";
@@ -248,6 +249,18 @@ function Home() {
       )}
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <FocusTimer
+          userId={userId}
+          variant={variant}
+          momName={momName}
+          goals={goalsQuery.data ?? []}
+          showVoiceHint={shouldShowVoiceHint(profile?.voice_play_count)}
+          onVoiceStarted={noteVoiceStarted}
+          onLogged={() => {
+            queryClient.invalidateQueries({ queryKey: ["logs", userId] });
+            queryClient.invalidateQueries({ queryKey: ["messages", userId] });
+          }}
+        />
         <Button onClick={() => speakMutation.mutate("nudge")} disabled={busy}>
           Nag me now
         </Button>
