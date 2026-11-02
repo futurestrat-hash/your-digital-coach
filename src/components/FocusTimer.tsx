@@ -340,6 +340,8 @@ export function FocusTimer({
             </div>
 
             <p
+              data-away={awaySeconds}
+              data-verdict={verdict}
               className={`text-center text-sm font-semibold ${
                 verdict === "stayed" ? "text-jade" : "text-primary"
               }`}
