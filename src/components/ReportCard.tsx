@@ -30,7 +30,7 @@ export function ReportCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
 
-  const shareText = `My Tiger Mom report card: ${card.grade} — "${card.verdict}" ${weekMinutes} min logged this week toward ${targetMinutes} min. ${SITE_URL}`;
+  const shareText = `My Tiger Mom report card: ${card.grade} — "${card.verdict}" ${weekMinutes} min logged in the last 7 days toward ${targetMinutes} min. ${SITE_URL}`;
 
   async function cardPng(): Promise<Blob> {
     if (!cardRef.current) throw new Error("missing card");
@@ -74,12 +74,12 @@ export function ReportCard({
 
   return (
     <section className="mt-6">
-      <h2 className="font-display text-xl font-bold">This week's report card</h2>
+      <h2 className="font-display text-xl font-bold">Last 7 days report card</h2>
       <div ref={cardRef} className="paper-card mt-3 flex items-center gap-4 p-5">
         <img src={art} alt={`${momName} looking ${card.mood}`} width={768} height={1024} className="h-28 w-auto drop-shadow-lg" />
         <div className="flex-1">
           <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-            {firstName} · week of {weekStart}
+            {firstName} · last 7 days · through {weekStart}
           </p>
           <p className="font-display text-5xl font-extrabold text-primary">{card.grade}</p>
           <p className="mt-1 text-sm font-semibold text-foreground">"{card.verdict}"</p>
