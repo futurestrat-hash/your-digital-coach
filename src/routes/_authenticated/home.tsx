@@ -320,18 +320,10 @@ function Home() {
         variant={variant}
         momName={momName}
         firstName={(profile?.display_name ?? "You").trim().split(/\s+/)[0] || "You"}
-        weekMinutes={logs
-          .filter((log) => new Date(log.logged_at) >= weekStartApproximation)
-          .reduce((sum, log) => sum + (log.minutes ?? 0), 0)}
+        weekMinutes={weekMinutes}
         targetMinutes={(goalsQuery.data ?? []).reduce((sum, goal) => sum + goal.weekly_minutes_target, 0)}
-        activeDays={
-          new Set(
-            logs
-              .filter((log) => new Date(log.logged_at) >= weekStartApproximation)
-              .map((log) => new Date(log.logged_at).toDateString()),
-          ).size
-        }
-        weekStart={weekStart}
+        activeDays={activeDays}
+        weekStart={new Date().toLocaleDateString('en-CA', { timeZone: profile?.timezone ?? 'UTC' })}
       />
 
       {qualifiedGoals.length > 0 && (
