@@ -181,24 +181,16 @@ export function FocusTimer({
 
   useEffect(() => {
     if (phase !== "running") return;
-    const log = (entry: string) => {
-      const w = window as unknown as { __awayLog?: string[] };
-      w.__awayLog = [...(w.__awayLog ?? []), entry];
-    };
-    log("attach");
     let hiddenAt: number | null = null;
     const onVisibility = () => {
-      log(`hidden=${document.hidden}`);
       if (document.hidden) hiddenAt = Date.now();
       else if (hiddenAt !== null) {
         bumpAway((Date.now() - hiddenAt) / 1000);
         hiddenAt = null;
-        log(`bumped=${awayRef.current}`);
       }
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      log("detach");
       document.removeEventListener("visibilitychange", onVisibility);
       if (hiddenAt !== null) bumpAway((Date.now() - hiddenAt) / 1000);
     };
@@ -340,8 +332,6 @@ export function FocusTimer({
             </div>
 
             <p
-              data-away={awaySeconds}
-              data-verdict={verdict}
               className={`text-center text-sm font-semibold ${
                 verdict === "stayed" ? "text-jade" : "text-primary"
               }`}

@@ -7,5 +7,5 @@
 - [x] Add claim-once weekly sliced-fruit rewards and explanation
 - [x] Verify signed-in desktop and mobile flows
 - [x] Add private weekly report card on Home with copy-text and save-image buttons (no public page)
-- [ ] Add "Study with Mom" focus timer with in-voice length names (Warm-up / The sit-down / Serious effort), away detection and auto-logging
+- [x] Add "Study with Mom" focus timer with in-voice length names (Warm-up / The sit-down / Serious effort), away detection and auto-logging
 - [ ] Activate automatic reminder delivery — blocked until the app is published and its signed schedule can target the live address
